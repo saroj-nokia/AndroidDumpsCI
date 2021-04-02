@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 env:
-  ROM_URL: https://pilotfiber.dl.sourceforge.net/project/crdroid//j7xelte/6.x/crDroidAndroid-10.0-20210125-j7xelte-v6.14.zip
+  ROM_URL: https://dlcdnets.asus.com/pub/ASUS/ZenFone/ZB634KL/UL-A001D-WW-16.14.2006.305-user.zip
   TZ: America/Sao_Paulo
 
 jobs:
