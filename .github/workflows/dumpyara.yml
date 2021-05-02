@@ -17,7 +17,8 @@ jobs:
 
        - name: Setup Dump Environment
          run: |
-              sudo apt install unace unrar zip unzip p7zip-full p7zip-rar sharutils rar uudeview mpack arj cabextract device-tree-compiler liblzma-dev python3-pip python3-setuptools brotli liblz4-tool axel gawk aria2 detox cpio rename
+              sudo apt update -y && sudo apt upgrade -y
+              sudo apt install unace python3 unrar zip unzip p7zip-full p7zip-rar sharutils rar uudeview mpack arj cabextract device-tree-compiler liblzma-dev python3-pip python3-setuptools brotli liblz4-tool axel gawk aria2 detox cpio rename -y
               pip3 install pip setuptools wheel -U
               pip3 install backports.lzma protobuf pycrypto docopt zstandard twrpdtgen
 
