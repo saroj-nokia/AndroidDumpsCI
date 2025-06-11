@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 env:
-  ROM_URL: https://bigota.d.miui.com/21.4.28/miui_BEGONIA_21.4.28_1e56f9b968_11.0.zip
+  ROM_URL: https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS2.0.11.0.VNGMIXM/sapphire_global-ota_full-OS2.0.11.0.VNGMIXM-user-15.0-c9b31d1dfe.zip
 
 jobs:
   build:
