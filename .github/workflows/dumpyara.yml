@@ -1,46 +1,45 @@
 name: Dump
- 
-on:
-  push:
-    branches: [ main ]
+on: # Corrected indentation here
+  push:
+    branches: [ main ]
 
 env:
-  ROM_URL: https://cdnorg.d.miui.com/OS2.0.12.0.VNGMIXM/sapphire_global-ota_full-OS2.0.12.0.VNGMIXM-user-15.0-0d83972b99.zip
+  ROM_URL: https://cdnorg.d.miui.com/OS2.0.12.0.VNGMIXM/sapphire_global-ota_full-OS2.0.12.0.VNGMIXM-user-15.0-0d83972b99.zip
 
 jobs:
-  build:
-    runs-on: ubuntu-22.04
+  build:
+    runs-on: ubuntu-22.04
 
-    steps:
-       - name: Checkouts
-         uses: actions/checkout@v4
+    steps:
+      - name: Checkouts
+        uses: actions/checkout@v4
 
-       - name: Setup Dump Environment
-         run: |
-              sudo apt update -y && sudo apt upgrade -y
-              sudo apt install unace python3 unrar zip unzip p7zip-full p7zip-rar sharutils rar uudeview mpack arj cabextract device-tree-compiler liblzma-dev python3-pip python3-setuptools brotli liblz4-tool axel gawk aria2 detox cpio rename -y
-              # Upgrade pip and setuptools first
-              pip3 install pip -U
-              # Downgrade setuptools to a compatible version before installing backports.lzma
-              pip3 install setuptools==69.5.1 wheel -U
-              pip3 install backports.lzma protobuf pycrypto docopt zstandard twrpdtgen
+      - name: Setup Dump Environment
+        run: |
+          sudo apt update -y && sudo apt upgrade -y
+          sudo apt install unace python3 unrar zip unzip p7zip-full p7zip-rar sharutils rar uudeview mpack arj cabextract device-tree-compiler liblzma-dev python3-pip python3-setuptools brotli liblz4-tool axel gawk aria2 detox cpio rename -y
+          # Upgrade pip and setuptools first
+          pip3 install pip -U
+          # Downgrade setuptools to a compatible version before installing backports.lzma
+          pip3 install setuptools==69.5.1 wheel -U
+          pip3 install backports.lzma protobuf pycrypto docopt zstandard twrpdtgen
 
-       - name: Running Dumpyara Shell Script
-         run: |
-              bash .github/workflows/dumpyara.sh "$ROM_URL"
+      - name: Running Dumpyara Shell Script
+        run: |
+          bash .github/workflows/dumpyara.sh "$ROM_URL"
 
-       - name: Checking Folder
-         run: |
-              cd /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/
-              ls -la
+      - name: Checking Folder
+        run: |
+          cd /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/
+          ls -la
 
-       - name: Compressing with tar.xz
-         run: |
-              cd /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/
-              tar c /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/* | nice -n19 xz -9 -T4 > dump.tar.xz
+      - name: Compressing with tar.xz
+        run: |
+          cd /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/
+          tar c /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/* | nice -n19 xz -9 -T4 > dump.tar.xz
 
-       - name: Store Generated Files
-         uses: actions/upload-artifact@v4
-         with:
-           path: /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/dump.tar.xz
-           if-no-files-found: error
+      - name: Store Generated Files
+        uses: actions/upload-artifact@v4
+        with:
+          path: /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/dump.tar.xz
+          if-no-files-found: error
