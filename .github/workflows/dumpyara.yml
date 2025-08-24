@@ -26,6 +26,7 @@ jobs:
 
       - name: Running Dumpyara Shell Script
         run: |
+          bash .github/workflows/setup.sh
           bash .github/workflows/dumpyara.sh "$ROM_URL"
 
       - name: Checking Folder
