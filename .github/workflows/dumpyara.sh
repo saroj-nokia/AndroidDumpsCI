@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 
 # Add logging definition to make output clearer
@@ -518,3 +517,4 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
 else
     LOGI "Dump done locally."
     exit 0
+fi
