@@ -517,7 +517,7 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
     git commit -asm "Add product for ${description}" && "${GITPUSH[@]}"
 else
     LOGI "Dump done locally."
-    exit 1
+    exit 0
 fi
 
 # Telegram channel
