@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 
 # Add logging definition to make output clearer
@@ -174,14 +175,13 @@ for partition in "${PARTITIONS[@]}"; do
         # Try to extract file through '7z'
         ${FSCK_EROFS} --extract="${partition}" "${partition}".img >> /dev/null 2>&1 || {
                 # Try to extract file through '7z'
-                7z x "${partition}".img -y -o"${partition}"/ > /dev/null || {
+                7z -snld x "${partition}".img -y -o"${partition}"/ > /dev/null || {
                 LOGE "'${partition}' extraction via '7z' failed."
 
                 # Only abort if we're at the first occourence
-                # The error is likely due to the file not being a 7z archive, so we continue.
-                # if [[ "${partition}" == "${PARTITIONS[0]}" ]]; then
-                #   LOGF "Aborting dumping considering it's a crucial partition."
-                # fi
+                if [[ "${partition}" == "${PARTITIONS[0]}" ]]; then
+                    LOGF "Aborting dumping considering it's a crucial partition."
+                fi
             }
         }
 
@@ -196,7 +196,7 @@ if [ -f "fsg.mbn" ]; then
     mkdir "radio/fsg"
 
     # Thankfully, 'fsg.mbn' is a simple EXT2 partition
-    7zz x "fsg.mbn" -o"radio/fsg" > /dev/null
+    7zz -snld x "fsg.mbn" -o"radio/fsg" > /dev/null
 
     # Remove 'fsg.mbn'
     rm -rf "fsg.mbn"
@@ -215,7 +215,7 @@ for image in boot vendor_boot vendor_kernel_boot; do
 
         ## Retrive image's ramdisk, and extract it
         unlz4 "${image}"/"${image}".img-*ramdisk "${image}/ramdisk.lz4" >> /dev/null 2>&1
-        7z x "${image}/ramdisk.lz4" -o"${image}/ramdisk" >> /dev/null 2>&1  || \
+        7z -snld x "${image}/ramdisk.lz4" -o"${image}/ramdisk" >> /dev/null 2>&1  || \
             LOGI "Failed to extract ramdisk."
 
         ## Clean-up
@@ -518,4 +518,3 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
 else
     LOGI "Dump done locally."
     exit 0
-fi
