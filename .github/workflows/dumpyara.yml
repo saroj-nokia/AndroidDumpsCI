@@ -16,15 +16,16 @@ jobs:
 
       - name: Setup Dump Environment
         run: |
-          # 1. Install core dependencies, including compilation tools
+          # 1. Install core dependencies, including compilation tools and zstd
           sudo apt update -y && sudo apt upgrade -y
-          sudo apt install unace python3 unrar zip unzip p7zip-full p7zip-rar sharutils rar uudeview mpack arj cabextract device-tree-compiler liblzma-dev python3-pip python3-setuptools brotli liblz4-tool axel gawk aria2 detox cpio rename build-essential curl -y
+          sudo apt install unace python3 unrar zip unzip p7zip-full p7zip-rar sharutils rar uudeview mpack arj cabextract device-tree-compiler liblzma-dev python3-pip python3-setuptools brotli liblz4-tool axel gawk aria2 detox cpio rename build-essential curl zstd -y
           
-          # 2. Install Rust/Cargo to compile ripgrep
+          # 2. FIX: Install Rust/Cargo for ripgrep compilation
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           
-          # 3. FIX: Compile and install ripgrep with the PCRE2 feature enabled
+          # 3. Compile and install ripgrep with PCRE2 feature enabled
+          # This resolves the 'PCRE2 is not available' error.
           cargo install ripgrep --features pcre2
           
           # 4. Install Python dependencies
@@ -42,13 +43,14 @@ jobs:
           cd /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/
           ls -la
 
-      - name: Compressing with tar.xz
+      - name: Compressing with tar.zst (Faster)
         run: |
           cd /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/
-          tar c /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/* | nice -n19 xz -9 -T4 > dump.tar.xz
+          # Uses zstd algorithm and -T0 to use all available threads for maximum speed.
+          tar c /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/* | zstd -T0 -3 > dump.tar.zst
 
       - name: Store Generated Files
         uses: actions/upload-artifact@v4
         with:
-          path: /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/dump.tar.xz
+          path: /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/dump.tar.zst # Updated extension
           if-no-files-found: error
