@@ -49,20 +49,6 @@ jobs:
           bash .github/workflows/setup.sh
           bash .github/workflows/dumpyara.sh "$ROM_URL"
 
-      - name: Free up disk space after extraction 🧹
-        run: |
-          # Change directory to the working folder
-          cd /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/
-          
-          # Delete the original downloaded ZIP/OTA file (crucial for freeing space)
-          rm -f *.zip
-          
-          # Delete large, raw partition images (*.img) after contents have been extracted
-          rm -f *.img
-          
-          # Show remaining disk space
-          df -h .
-
       - name: Checking Folder
         run: |
           cd /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/
