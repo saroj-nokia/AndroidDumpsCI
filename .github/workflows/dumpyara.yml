@@ -16,11 +16,19 @@ jobs:
 
       - name: Setup Dump Environment
         run: |
+          # 1. Install core dependencies, including compilation tools
           sudo apt update -y && sudo apt upgrade -y
-          sudo apt install unace python3 unrar zip unzip p7zip-full p7zip-rar sharutils rar uudeview mpack arj cabextract device-tree-compiler liblzma-dev python3-pip python3-setuptools brotli liblz4-tool axel gawk aria2 detox cpio rename -y
-          # Upgrade pip and setuptools first
+          sudo apt install unace python3 unrar zip unzip p7zip-full p7zip-rar sharutils rar uudeview mpack arj cabextract device-tree-compiler liblzma-dev python3-pip python3-setuptools brotli liblz4-tool axel gawk aria2 detox cpio rename build-essential curl -y
+          
+          # 2. Install Rust/Cargo to compile ripgrep
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          
+          # 3. FIX: Compile and install ripgrep with the PCRE2 feature enabled
+          cargo install ripgrep --features pcre2
+          
+          # 4. Install Python dependencies
           pip3 install pip -U
-          # Downgrade setuptools to a compatible version before installing backports.lzma
           pip3 install setuptools==69.5.1 wheel -U
           pip3 install backports.lzma protobuf pycrypto docopt zstandard twrpdtgen
 
