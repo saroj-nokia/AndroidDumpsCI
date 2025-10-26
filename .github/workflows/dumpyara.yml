@@ -1,14 +1,24 @@
 name: Dump
-on: # Corrected indentation here
+
+# 1. Enable manual workflow trigger and define a URL input
+on:
   push:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      rom_url:
+        description: 'Firmware Download URL (e.g., OTA, Fastboot ZIP)'
+        required: true
+        default: 'https://cdnorg.d.miui.com/OS2.0.206.0.VNGMIXM/sapphire_global-ota_full-OS2.0.206.0.VNGMIXM-user-15.0-66bfbbb217.zip'
 
-env:
-  ROM_URL: https://cdnorg.d.miui.com/OS2.0.206.0.VNGMIXM/sapphire_global-ota_full-OS2.0.206.0.VNGMIXM-user-15.0-66bfbbb217.zip
-
+# Remove the 'env' block and use the input variable directly
 jobs:
   build:
     runs-on: ubuntu-22.04
+    
+    # 2. Define the ROM_URL variable using the input
+    env:
+      ROM_URL: ${{ github.event.inputs.rom_url }}
 
     steps:
       - name: Checkouts
@@ -16,7 +26,7 @@ jobs:
 
       - name: Setup Dump Environment
         run: |
-          # 1. Install core dependencies, including compilation tools and zstd
+          # 1. Install core dependencies, including compilation tools, zstd, and curl
           sudo apt update -y && sudo apt upgrade -y
           sudo apt install unace python3 unrar zip unzip p7zip-full p7zip-rar sharutils rar uudeview mpack arj cabextract device-tree-compiler liblzma-dev python3-pip python3-setuptools brotli liblz4-tool axel gawk aria2 detox cpio rename build-essential curl zstd -y
           
@@ -34,9 +44,24 @@ jobs:
           pip3 install backports.lzma protobuf pycrypto docopt zstandard twrpdtgen
 
       - name: Running Dumpyara Shell Script
+        # Use the ROM_URL environment variable set from the workflow input
         run: |
           bash .github/workflows/setup.sh
           bash .github/workflows/dumpyara.sh "$ROM_URL"
+
+      - name: Free up disk space after extraction 🧹
+        run: |
+          # Change directory to the working folder
+          cd /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/
+          
+          # Delete the original downloaded ZIP/OTA file (crucial for freeing space)
+          rm -f *.zip
+          
+          # Delete large, raw partition images (*.img) after contents have been extracted
+          rm -f *.img
+          
+          # Show remaining disk space
+          df -h .
 
       - name: Checking Folder
         run: |
@@ -46,11 +71,12 @@ jobs:
       - name: Compressing with tar.zst (Faster)
         run: |
           cd /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/
-          # Uses zstd algorithm and -T0 to use all available threads for maximum speed.
+          # Uses zstd -T0 (all threads) at level 3 for a fast, efficient compresssion.
           tar c /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/* | zstd -T0 -3 > dump.tar.zst
 
-      - name: Store Generated Files
+      - name: Store Generated Files as Artifact
         uses: actions/upload-artifact@v4
         with:
-          path: /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/dump.tar.zst # Updated extension
+          path: /home/runner/work/AndroidDumpsCI/AndroidDumpsCI/.github/workflows/working/dump.tar.zst
           if-no-files-found: error
+          name: ${{ github.run_id }}_dump_files
