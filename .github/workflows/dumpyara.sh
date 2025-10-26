@@ -178,9 +178,10 @@ for partition in "${PARTITIONS[@]}"; do
                 LOGE "'${partition}' extraction via '7z' failed."
 
                 # Only abort if we're at the first occourence
-                if [[ "${partition}" == "${PARTITIONS[0]}" ]]; then
-                    LOGF "Aborting dumping considering it's a crucial partition."
-                fi
+                # The error is likely due to the file not being a 7z archive, so we continue.
+                # if [[ "${partition}" == "${PARTITIONS[0]}" ]]; then
+                #   LOGF "Aborting dumping considering it's a crucial partition."
+                # fi
             }
         }
 
